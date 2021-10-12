@@ -1,0 +1,41 @@
+#!/bin/sh
+#09/2021
+#dictionary path
+dict="/usr/share/hunspell/en_US.dic"
+
+#count number of lines in the dictionary
+nbrlines=$(grep -c -E '^' $dict)
+#echo $nbrlines   #to debug
+
+#generating a random line from the dictionary
+randomline=$(shuf -i 1-$nbrlines -n 1)
+echo there are $nbrlines lines in all the dictionary and the one that is selected is the $randomline
+
+#selection of the chosen line/word
+word=$(head -n $randomline $dict | tail -1)
+
+#removal of all symbols after the chosen word
+word=$(echo $word | cut -d '/' -f 1)
+word=$(echo $word | awk '{print $1}')
+
+#dispay of the word on the console
+echo $word #possible to use : 'watch -n 3 ./memory.sh' to display awords every three seconds in a console
+
+
+############################  other test that needs to be corrected  ################################
+#clear  #easy if command stay on the top 
+#until $# = 7 
+#do
+#	echo -n 'type this next option : '
+#	read Reslt
+#	if [ $Reslt = $1 ]; then
+#		echo 'congratulation !'
+#	else
+#		echo 'noOO !! It was' $1', not' $Reslt 'little rascal'
+#		sleep 2 #just for  the fun of the raging script
+#		echo "you'r ban from here !! BADABIM !! You can't do anything against this clever script"
+#		exit 1
+#	fi
+#	shift # we scroll
+#done
+#echo 'you wine !!'

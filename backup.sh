@@ -1,0 +1,67 @@
+#! /bin/bash
+#author : tipio - september 21
+#code  made from advice from Adrien.D (Linux Tricks) and Cristophe.C (Brain)
+
+############  script of saving for files or folders by sftp protocol in the NAS64GO hosted on rpi1
+
+#display an help for user
+if [[ "$1" == 'help' ]]
+then
+	date=$(date +%d-%m-%Y)
+        echo "$date using name script and pass to execute"
+        exit 0
+fi
+
+if [[ $# -ne 3 ]]
+then
+        echo 'all options are not included correctly'
+        exit 20
+fi
+
+#variables
+date=$(date +%Y-%m-%d)
+sftp_pass=$1
+#sftp_user='pi'
+sftp_user='tipio'
+sftp_host_ip=$2
+sftp_file2copy=$3
+sftp_dir2copy=/Users/tipio/Documents/github/backupTest/backup_$date
+#sftp_dir2copy=/data/nas/backup/files_backup/backup_$date
+# if using special ssh port : scp_port='$4'
+# if using relay : scp_realy='$5'
+
+#ping the host ######################################################## have to correct ping option ??
+if [[ $(ping -c 1 -W 1 $sftp_host_ip | grep -c "time") -eq 0 ]]
+then
+        echo '$sftp_host_ip do not answer'
+        exit 21
+fi
+
+function sftpCopy(){
+	#host_pass='$1'
+        #host_user='pi'
+	#host_ip='$2'
+        #file2copy='$3'
+        #dir2copy=/data/nas/backup/files_backup/backup_$date
+
+	sshpass -p $sftp_pass sftp $sftp_user@$sftp_host_ip << ENDSFTP
+	mkdir $sftp_dir2copy
+	put $line $sftp_dir2copy
+	exit
+ENDSFTP
+}
+
+# script execution
+# search if the file or folder to backup exist and run backup
+if [[ -f $sftp_file2copy ]]
+then
+	for line in $(cat /home/tipio/bin/backup_list.txt)
+do
+	#sudo sysctl -w net.ipv4.ping_group_range="0 1001"
+	cd /home/tipio/bin
+	sftpCopy
+done
+echo $date
+else
+        echo "this file does nit exit"
+fi
